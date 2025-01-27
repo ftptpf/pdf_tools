@@ -11,6 +11,12 @@ public class PdfMerger {
 
     public void run(String[] args) {
 
+
+        if (args.length < 3) {
+            throw new IllegalArgumentException("Неверное количество переданных аргументов. "
+                    + "Должен быть указан 1 итоговый фай и минимум 2 которые будут объединены.");
+        }
+
         File outputFile = new File(args[0]);
         List<File> files = List.of(args).subList(1, args.length).stream()
                 .map(File::new)
