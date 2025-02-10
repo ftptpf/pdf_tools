@@ -12,18 +12,32 @@ public class AppRunner {
         boolean exit = false;
 
         while (!exit) {
-            System.out.println("Меню");
-            System.out.println("1 - Объединить файлы");
-            System.out.println("2 - Выход");
-            System.out.print("Введите номер меню: ");
+            System.out.println("*** Меню ***");
+            System.out.println("1 - Объединить pdf файлы в один");
+            System.out.println("2 - Вставить в pdf файл страницы");
+            System.out.println("3 - Извлечь страницы из pdf файла");
+            System.out.println("4 - Удалить страницы из pdf файла");
+            System.out.println("5 - Выйти из программы");
+            System.out.println("Введите номер меню: ");
 
             int choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
-                    System.out.println("Объединение файлов");
+                    System.out.println("Объединить pdf файлы в один");
+                    PdfMerger pdfMerger = new PdfMerger();
+                    pdfMerger.merge();
                     break;
                 case 2:
+                    System.out.println("Вставить в pdf файл страницы");
+                    break;
+                case 3:
+                    System.out.println("Извлечь страницы из pdf файла");
+                    break;
+                case 4:
+                    System.out.println("Удалить страницы из pdf файла");
+                    break;
+                case 5:
                     exit = true;
                     break;
                 default:
@@ -31,14 +45,5 @@ public class AppRunner {
             }
 
         }
-
-/*
-
-
-
-        PdfMerger merger = new PdfMerger();
-        merger.run(args);
-*/
-
     }
 }

@@ -1,29 +1,43 @@
 package ru.ftptpf.service;
 
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import ru.ftptpf.util.RandomFileName;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class PdfMerger {
 
-    public void run(String[] args) {
+    public void merge() {
 
+        String outputFileName = "merge-result-" + RandomFileName.get(5) + ".pdf";
+        Path inputPath = Path.of("src", "main", "resources", "1-merge-folder-in");
+        Path outputPath = Path.of("src", "main", "resources", "1-merge-folder-result", outputFileName);
 
-        if (args.length < 3) {
-            throw new IllegalArgumentException("Неверное количество переданных аргументов. "
-                    + "Должен быть указан 1 итоговый фай и минимум 2 которые будут объединены.");
+        try {
+            Files.createDirectory(outputPath.getParent());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        File outputFile = new File(args[0]);
-        List<File> files = List.of(args).subList(1, args.length).stream()
-                .map(File::new)
-                .toList();
+        List<File> files = new ArrayList<>();
+
+        try (Stream<Path> pathStream = Files.list(inputPath)) {
+            files = pathStream
+                    .map(Path::toFile)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         PDFMergerUtility mergerUtility = new PDFMergerUtility();
-        mergerUtility.setDestinationFileName(outputFile.toString());
+        mergerUtility.setDestinationFileName(outputPath.toString());
 
         for (File file : files) {
             try {
