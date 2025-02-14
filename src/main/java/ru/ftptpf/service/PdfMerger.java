@@ -11,9 +11,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class PdfMerger {
+public class PdfMerger implements PdfService {
 
-    public void merge() {
+    public void run() {
 
         String outputFileName = "merge-result-" + CurrentDateTime.get() + ".pdf";
         Path inputPath = Path.of("src", "main", "resources", "1-merge-folder-in");
@@ -35,6 +35,10 @@ public class PdfMerger {
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        if (files.size() < 2) {
+            throw new RuntimeException("В папке должно быть минимум два файла");
         }
 
         PDFMergerUtility mergerUtility = new PDFMergerUtility();
