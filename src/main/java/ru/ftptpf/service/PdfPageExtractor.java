@@ -4,13 +4,12 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PageExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import ru.ftptpf.util.CurrentDateTime;
+import ru.ftptpf.util.DirectoryUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class PdfPageExtractor implements PdfService {
 
@@ -32,27 +31,15 @@ public class PdfPageExtractor implements PdfService {
         Path inputPath = Path.of("src", "main", "resources", INPUT_DIR_NAME);
         Path outputPath = Path.of("src", "main", "resources", OUTPUT_DIR_NAME, outputFileName);
 
-        try {
-            if (!Files.exists(outputPath.getParent())) {
-                Files.createDirectory(outputPath.getParent());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        DirectoryUtil.createOutputDirectoryIfNotExist(outputPath);
 
-        List<File> files;
-
-        try (Stream<Path> pathStream = Files.list(inputPath)) {
-            files = pathStream
-                    .map(Path::toFile)
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(inputPath);
 
         if (files.size() > 1) {
             throw new RuntimeException("Несколько файлов в папке. Уберите лишние файлы.");
         }
+
+        // TODO: Добавить проверку на то чтобы startPage и endPage были в диапазоне
 
         try {
             try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
