@@ -18,7 +18,7 @@ public class AppRunner {
             System.out.println("*** Меню ***");
             System.out.println("1 - Объединить pdf файлы в один");
             System.out.println("2 - Вставить в pdf файл страницы");
-            System.out.println("3 - Извлечь страницы и сохранить их новый pdf файл");
+            System.out.println("3 - Извлечь диапазон страниц и сохранить его в новый pdf файл");
             System.out.println("4 - Удалить страницы из pdf файла");
             System.out.println("5 - Выйти из программы");
             System.out.println("Введите номер меню: ");

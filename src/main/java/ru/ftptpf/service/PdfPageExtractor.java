@@ -38,11 +38,17 @@ public class PdfPageExtractor implements PdfService {
         if (files.size() > 1) {
             throw new RuntimeException("Несколько файлов в папке. Уберите лишние файлы.");
         }
-
-        // TODO: Добавить проверку на то чтобы startPage и endPage были в диапазоне
-
+        // TODO: вынести проверку диапазона страниц ближе к вводу значений
         try {
             try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
+                int numberOfPages = pdDocument.getNumberOfPages();
+                if (numberOfPages < startPage || numberOfPages > endPage) {
+                    throw new RuntimeException("В исходном документе " + numberOfPages + " страниц. "
+                            + System.lineSeparator()
+                            + "Вы хотите извлечь страницы с " + startPage + " по " + endPage
+                            + System.lineSeparator()
+                            + "Неверно указан диапазон извлекаемых страниц.");
+                }
                 PageExtractor pageExtractor = new PageExtractor(pdDocument, startPage, endPage);
                 try (PDDocument result = pageExtractor.extract()) {
                     result.save(outputPath.toFile());
@@ -53,9 +59,9 @@ public class PdfPageExtractor implements PdfService {
         }
 
         System.out.println("Из исходного файла были извлечены страницы с "
-                + startPage + " по "
-                + endPage + " и они в виде нового файла сохранены в: "
+                + startPage + " по " + endPage
+                + System.lineSeparator()
+                + " и они в виде нового файла сохранены в: "
                 + outputPath);
-
     }
 }
