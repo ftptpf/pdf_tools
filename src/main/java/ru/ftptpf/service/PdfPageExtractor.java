@@ -17,8 +17,8 @@ public class PdfPageExtractor implements PdfService {
     private static final String INPUT_DIR_NAME = "3-extract-folder-in";
     private static final String OUTPUT_DIR_NAME = "3-extract-folder-result";
 
-    private int startPage;
-    private int endPage;
+    private final int startPage;
+    private final int endPage;
 
     public PdfPageExtractor(int startPage, int endPage) {
         this.startPage = startPage;
@@ -38,17 +38,9 @@ public class PdfPageExtractor implements PdfService {
         if (files.size() > 1) {
             throw new RuntimeException("Несколько файлов в папке. Уберите лишние файлы.");
         }
-        // TODO: вынести проверку диапазона страниц ближе к вводу значений
         try {
             try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
-                int numberOfPages = pdDocument.getNumberOfPages();
-                if (numberOfPages < startPage || numberOfPages > endPage) {
-                    throw new RuntimeException("В исходном документе " + numberOfPages + " страниц. "
-                            + System.lineSeparator()
-                            + "Вы хотите извлечь страницы с " + startPage + " по " + endPage
-                            + System.lineSeparator()
-                            + "Неверно указан диапазон извлекаемых страниц.");
-                }
+                System.out.println("Исходный файл содержит " + pdDocument.getNumberOfPages() + " страниц.");
                 PageExtractor pageExtractor = new PageExtractor(pdDocument, startPage, endPage);
                 try (PDDocument result = pageExtractor.extract()) {
                     result.save(outputPath.toFile());
@@ -58,10 +50,11 @@ public class PdfPageExtractor implements PdfService {
             throw new RuntimeException(e);
         }
 
-        System.out.println("Из исходного файла были извлечены страницы с "
-                + startPage + " по " + endPage
+        System.out.println("Диапазон заданных страницы в виде нового файла был сохранен в: "
                 + System.lineSeparator()
-                + " и они в виде нового файла сохранены в: "
-                + outputPath);
+                + outputPath
+                + System.lineSeparator()
+                + "Если мы задали страницы которые выходили за пределы диапазона, "
+                + "то они будут сохранены в рамках максимально возможных значений.");
     }
 }
