@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public class PdfMerger implements PdfService {
+public class Merge implements PdfService {
 
     public void run() {
 

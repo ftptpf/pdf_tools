@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-public class PdfPageExtractor implements PdfService {
+public class Extract implements PdfService {
 
     private static final String PREFIX_FILE_NAME = "extracted-result-file-";
     private static final String INPUT_DIR_NAME = "3-extract-folder-in";
@@ -20,7 +20,7 @@ public class PdfPageExtractor implements PdfService {
     private final int startPage;
     private final int endPage;
 
-    public PdfPageExtractor(int startPage, int endPage) {
+    public Extract(int startPage, int endPage) {
         this.startPage = startPage;
         this.endPage = endPage;
     }
@@ -54,7 +54,7 @@ public class PdfPageExtractor implements PdfService {
                 + System.lineSeparator()
                 + outputPath
                 + System.lineSeparator()
-                + "Если мы задали страницы которые выходили за пределы диапазона, "
-                + "то они будут сохранены в рамках максимально возможных значений.");
+                + "Если были заданы страницы которые выходили за пределы диапазона, "
+                + "они будут сохранены в рамках максимально / минимально возможных значений.");
     }
 }
