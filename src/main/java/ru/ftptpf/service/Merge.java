@@ -44,6 +44,4 @@ public class Merge implements PdfService {
         }
         System.out.println("Объединенный файл создан: " + outputPath);
     }
-
-
 }

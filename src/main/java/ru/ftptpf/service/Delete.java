@@ -40,19 +40,24 @@ public class Delete implements PdfService {
             throw new RuntimeException("Несколько файлов в папке. Уберите лишние файлы.");
         }
 
-        //TODO сделать проверку чтобы не указывали удаление всех страниц
         try {
             try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
                 int numberOfPages = pdDocument.getNumberOfPages();
                 System.out.println("Исходный файл содержит " + numberOfPages + " страниц.");
+
                 int startIndex = Math.max(0, startPage - 1);
                 int endIndex = Math.min(numberOfPages, endPage) - 1;
+
                 int deletePages = endIndex - startIndex + 1;
-                while (deletePages > 0) {
-                    pdDocument.removePage(startIndex);
-                    deletePages--;
+                if (startIndex != 0 && endIndex != (numberOfPages - 1)) {
+                    while (deletePages > 0) {
+                        pdDocument.removePage(startIndex);
+                        deletePages--;
+                    }
+                    pdDocument.save(outputPath.toFile());
+                } else {
+                    System.out.println("Вы не можете удалить все страницы. Попробуйте задать другой диапазон.");
                 }
-                pdDocument.save(outputPath.toFile());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
