@@ -1,9 +1,6 @@
 package ru.ftptpf;
 
-import ru.ftptpf.service.Delete;
-import ru.ftptpf.service.Merge;
-import ru.ftptpf.service.Extract;
-import ru.ftptpf.service.PdfService;
+import ru.ftptpf.service.*;
 
 import java.util.Scanner;
 
@@ -32,7 +29,13 @@ public class AppRunner {
                     merge.run();
                     break;
                 case 2:
-                    System.out.println("Вставить в pdf файл страницы");
+                    System.out.println("Введите сначала имя основного файла, а затем имя файла с добавляемыми страницами.");
+                    String mainFileName = scanner.next();
+                    String addedFileName = scanner.next();
+                    System.out.println("Введите номер страницы, после которой начнется вставка.");
+                    int insertAfterThisPage = scanner.nextInt();
+                    PdfService insert = new Insert(mainFileName, addedFileName, insertAfterThisPage);
+                    insert.run();
                     break;
                 case 3:
                     System.out.println("Введите диапазон извлекаемых страниц. Сначала первую потом последнюю.");
