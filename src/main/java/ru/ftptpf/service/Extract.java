@@ -3,19 +3,16 @@ package ru.ftptpf.service;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PageExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import ru.ftptpf.util.CurrentDateTime;
 import ru.ftptpf.util.DirectoryUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
-public class Extract implements PdfService {
+import static ru.ftptpf.util.PdfConst.EXTRACT_PATH;
+import static ru.ftptpf.util.PdfConst.EXTRACT_PATH_OUTPUT;
 
-    private static final String PREFIX_FILE_NAME = "extracted-result-file-";
-    private static final String INPUT_DIR_NAME = "3-extract-folder-in";
-    private static final String OUTPUT_DIR_NAME = "3-extract-folder-result";
+public class Extract implements PdfService {
 
     private final int startPage;
     private final int endPage;
@@ -27,34 +24,30 @@ public class Extract implements PdfService {
 
     public void run() {
 
-        String outputFileName = PREFIX_FILE_NAME + CurrentDateTime.get() + ".pdf";
-        Path inputPath = Path.of("src", "main", "resources", INPUT_DIR_NAME);
-        Path outputPath = Path.of("src", "main", "resources", OUTPUT_DIR_NAME, outputFileName);
+        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(EXTRACT_PATH);
 
-        DirectoryUtil.createOutputDirectoryIfNotExist(outputPath);
-
-        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(inputPath);
-
-        if (files.size() > 1) {
-            throw new RuntimeException("Несколько файлов в папке. Уберите лишние файлы.");
-        }
-        try {
-            try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
-                System.out.println("Исходный файл содержит " + pdDocument.getNumberOfPages() + " страниц.");
-                PageExtractor pageExtractor = new PageExtractor(pdDocument, startPage, endPage);
-                try (PDDocument result = pageExtractor.extract()) {
-                    result.save(outputPath.toFile());
+        if (files.size() == 1) {
+            try {
+                try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
+                    System.out.println("Исходный файл содержит " + pdDocument.getNumberOfPages() + " страниц.");
+                    PageExtractor pageExtractor = new PageExtractor(pdDocument, startPage, endPage);
+                    try (PDDocument result = pageExtractor.extract()) {
+                        result.save(EXTRACT_PATH_OUTPUT.toFile());
+                        System.out.println("Диапазон заданных страницы в виде нового файла был сохранен в: "
+                                + System.lineSeparator()
+                                + EXTRACT_PATH
+                                + System.lineSeparator()
+                                + "Если были заданы страницы которые выходили за пределы диапазона, "
+                                + "они будут сохранены в рамках максимально / минимально возможных значений.");
+                    }
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else if (files.size() > 1) {
+            System.out.println("В папке несколько файлов. Удалите лишние файлы и попробуйте снова.");
+        } else {
+            System.out.println("В папке нет файлов. Разместите в папке файл и попробуйте еще раз.");
         }
-
-        System.out.println("Диапазон заданных страницы в виде нового файла был сохранен в: "
-                + System.lineSeparator()
-                + outputPath
-                + System.lineSeparator()
-                + "Если были заданы страницы которые выходили за пределы диапазона, "
-                + "они будут сохранены в рамках максимально / минимально возможных значений.");
     }
 }

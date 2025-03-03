@@ -1,47 +1,45 @@
 package ru.ftptpf.service;
 
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import ru.ftptpf.util.CurrentDateTime;
 import ru.ftptpf.util.DirectoryUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
+
+import static ru.ftptpf.util.PdfConst.MERGE_PATH;
+import static ru.ftptpf.util.PdfConst.MERGE_PATH_OUTPUT;
 
 public class Merge implements PdfService {
 
     public void run() {
 
-        String outputFileName = "merge-result-" + CurrentDateTime.get() + ".pdf";
-        Path inputPath = Path.of("src", "main", "resources", "1-merge-folder-in");
-        Path outputPath = Path.of("src", "main", "resources", "1-merge-folder-result", outputFileName);
+        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(MERGE_PATH);
 
-        DirectoryUtil.createOutputDirectoryIfNotExist(outputPath);
+        if (files.size() >= 2 && files.size() <= 10) {
+            PDFMergerUtility mergerUtility = new PDFMergerUtility();
+            mergerUtility.setDestinationFileName(MERGE_PATH_OUTPUT.toString());
 
-        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(inputPath);
-
-        if (files.size() < 2) {
-            throw new RuntimeException("В папке должно быть минимум два файла");
-        }
-
-        PDFMergerUtility mergerUtility = new PDFMergerUtility();
-        mergerUtility.setDestinationFileName(outputPath.toString());
-
-        for (File file : files) {
+            for (File file : files) {
+                try {
+                    mergerUtility.addSource(file);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             try {
-                mergerUtility.addSource(file);
-            } catch (FileNotFoundException e) {
+                mergerUtility.mergeDocuments(null);
+                System.out.println("Объединенный файл создан: " + MERGE_PATH_OUTPUT);
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        } else if (files.size() == 1) {
+            System.out.println("В папке один файл. Добавьте еще как минимум один и попробуйте снова.");
+        } else if (files.size() > 10) {
+            System.out.println("В папке больше 10 файлов. Это слишком много. Удалите лишние и попробуйте снова.");
+        } else {
+            System.out.println("В папке нет файлов. Добавьте минимум 2 и попробуйте снова.");
         }
-
-        try {
-            mergerUtility.mergeDocuments(null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Объединенный файл создан: " + outputPath);
     }
 }

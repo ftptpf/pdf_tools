@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static ru.ftptpf.util.PdfConst.*;
+
 public final class DirectoryUtil {
 
     private DirectoryUtil() {
@@ -23,14 +25,20 @@ public final class DirectoryUtil {
         }
     }
 
-    public static void createOutputDirectoryIfNotExist(Path outputPath) {
+    public static void createDirectoryIfNotExist(Path path) {
         try {
-            if (!Files.exists(outputPath.getParent())) {
-                Files.createDirectory(outputPath.getParent());
+            if (!Files.exists(path)) {
+                Files.createDirectory(path);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static void createAllDirectories() {
+        createDirectoryIfNotExist(DELETE_PATH);
+        createDirectoryIfNotExist(INSERT_PATH);
+        createDirectoryIfNotExist(MERGE_PATH);
+        createDirectoryIfNotExist(EXTRACT_PATH);
+    }
 }

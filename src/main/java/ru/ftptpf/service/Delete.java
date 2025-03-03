@@ -2,20 +2,16 @@ package ru.ftptpf.service;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import ru.ftptpf.util.CurrentDateTime;
 import ru.ftptpf.util.DirectoryUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
+import static ru.ftptpf.util.PdfConst.DELETE_PATH;
+import static ru.ftptpf.util.PdfConst.DELETE_PATH_OUTPUT;
+
 public class Delete implements PdfService {
-
-
-    private static final String PREFIX_FILE_NAME = "delete-page-result-file-";
-    private static final String INPUT_DIR_NAME = "4-delete-folder-in";
-    private static final String OUTPUT_DIR_NAME = "4-delete-folder-result";
 
     private final int startPage;
     private final int endPage;
@@ -28,46 +24,41 @@ public class Delete implements PdfService {
     @Override
     public void run() {
 
-        String outputFileName = PREFIX_FILE_NAME + CurrentDateTime.get() + ".pdf";
-        Path inputPath = Path.of("src", "main", "resources", INPUT_DIR_NAME);
-        Path outputPath = Path.of("src", "main", "resources", OUTPUT_DIR_NAME, outputFileName);
+        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(DELETE_PATH);
 
-        DirectoryUtil.createOutputDirectoryIfNotExist(outputPath);
+        if (files.size() == 1) {
+            try {
+                try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
+                    int numberOfPages = pdDocument.getNumberOfPages();
+                    System.out.println("Исходный файл содержит " + numberOfPages + " страниц.");
 
-        List<File> files = DirectoryUtil.getPdfFilesFromDirectory(inputPath);
+                    int startIndex = Math.max(0, startPage - 1);
+                    int endIndex = Math.min(numberOfPages, endPage) - 1;
 
-        if (files.size() > 1) {
-            throw new RuntimeException("Несколько файлов в папке. Уберите лишние файлы.");
-        }
-
-        try {
-            try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
-                int numberOfPages = pdDocument.getNumberOfPages();
-                System.out.println("Исходный файл содержит " + numberOfPages + " страниц.");
-
-                int startIndex = Math.max(0, startPage - 1);
-                int endIndex = Math.min(numberOfPages, endPage) - 1;
-
-                int deletePages = endIndex - startIndex + 1;
-                if (startIndex != 0 && endIndex != (numberOfPages - 1)) {
-                    while (deletePages > 0) {
-                        pdDocument.removePage(startIndex);
-                        deletePages--;
+                    int deletePages = endIndex - startIndex + 1;
+                    if (startIndex != 0 && endIndex != (numberOfPages - 1)) {
+                        while (deletePages > 0) {
+                            pdDocument.removePage(startIndex);
+                            deletePages--;
+                        }
+                        pdDocument.save(DELETE_PATH_OUTPUT.toFile());
+                        System.out.println("Из файла был удален указанный диапазон страниц. Новый файл был сохранен в: "
+                                + System.lineSeparator()
+                                + DELETE_PATH_OUTPUT
+                                + System.lineSeparator()
+                                + "Если были заданы страницы которые выходили за пределы диапазона, "
+                                + "они будут удалены в рамках максимально / минимально возможных значений.");
+                    } else {
+                        System.out.println("Вы не можете удалить все страницы. Попробуйте задать другой диапазон.");
                     }
-                    pdDocument.save(outputPath.toFile());
-                } else {
-                    System.out.println("Вы не можете удалить все страницы. Попробуйте задать другой диапазон.");
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else if (files.size() > 1) {
+            System.out.println("В папке несколько файлов. Удалите лишние файлы и попробуйте снова.");
+        } else {
+            System.out.println("В папке нет файлов. Разместите в папке 1 файл и попробуйте еще раз.");
         }
-
-        System.out.println("Из файла был удален указанный диапазон страниц. Новый файл был сохранен в: "
-                + System.lineSeparator()
-                + outputPath
-                + System.lineSeparator()
-                + "Если были заданы страницы которые выходили за пределы диапазона, "
-                + "они будут удалены в рамках максимально / минимально возможных значений.");
     }
 }

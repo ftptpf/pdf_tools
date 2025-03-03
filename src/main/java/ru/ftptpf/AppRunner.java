@@ -1,6 +1,7 @@
 package ru.ftptpf;
 
 import ru.ftptpf.service.*;
+import ru.ftptpf.util.DirectoryUtil;
 
 import java.util.Scanner;
 
@@ -8,8 +9,8 @@ public class AppRunner {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
         boolean exit = false;
+        DirectoryUtil.createAllDirectories();
 
         while (!exit) {
             System.out.println();
