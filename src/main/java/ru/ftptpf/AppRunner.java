@@ -15,8 +15,8 @@ public class AppRunner {
         while (!exit) {
             System.out.println();
             System.out.println("*** Меню ***");
-            System.out.println("1 - Объединить pdf файлы в один");
-            System.out.println("2 - Вставить в pdf файл страницы");
+            System.out.println("1 - Объединить до 10 pdf файлов в один");
+            System.out.println("2 - Вставить в pdf файл страницы другого pdf файла");
             System.out.println("3 - Извлечь диапазон страниц и сохранить его в новый pdf файл");
             System.out.println("4 - Удалить страницы из pdf файла");
             System.out.println("5 - Выйти из программы");
