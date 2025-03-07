@@ -2,6 +2,7 @@ package ru.ftptpf.service;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import ru.ftptpf.util.DirectoryUtil;
 
 import java.io.File;
@@ -27,8 +28,6 @@ public class Insert implements PdfService {
     public void run() {
 
         List<File> files = DirectoryUtil.getPdfFilesFromDirectory(INSERT_PATH);
-        String file1 = files.getFirst().getName();
-        String file2 = files.getLast().getName();
 
         List<String> names = files.stream()
                 .map(File::getName)
@@ -36,34 +35,47 @@ public class Insert implements PdfService {
 
         if (!names.contains(mainFileName) && !names.contains(addedFileName)) {
             System.out.println("Файлы в папке не найдены! Проверьте наименования файлов и попробуйте ещё раз!");
-        } else if (files.size() == 2) {
+        } else if (files.size() >= 2 && files.size() <= 10) {
             try (PDDocument mainDocument = Loader.loadPDF(
-                    file1.equals(mainFileName) ? files.getFirst() : files.getLast());
+                    files.stream()
+                            .filter(file -> file.getName().equals(mainFileName))
+                            .toList()
+                            .getFirst());
                  PDDocument addedDocument = Loader.loadPDF(
-                         file2.equals(addedFileName) ? files.getLast() : files.getFirst());
+                         files.stream()
+                                 .filter(file -> file.getName().equals(addedFileName))
+                                 .toList()
+                                 .getFirst());
                  PDDocument resultDocument = new PDDocument()) {
-                int numberOfPagesInMainFile = mainDocument.getNumberOfPages();
-                int numberOfPagesInAddedFile = addedDocument.getNumberOfPages();
+
+                int pagesInMainFile = mainDocument.getNumberOfPages();
+                int pagesInAddedFile = addedDocument.getNumberOfPages();
 
                 int startIndex = 0;
-                if (insertAfterThisPage >= numberOfPagesInMainFile) {
-                    startIndex = numberOfPagesInMainFile - 1;
+                if (insertAfterThisPage >= pagesInMainFile) {
+                    startIndex = pagesInMainFile - 1;
                 } else if (insertAfterThisPage >= 1) {
-                    startIndex = insertAfterThisPage - 1;
+                    startIndex = insertAfterThisPage;
                 }
 
-                for (int i = 0; i < numberOfPagesInMainFile - 1; i++) {
+                //TODO:решить проблему с вставкой когда вставляется в конец файла
+                for (int i = 0; i < pagesInMainFile; i++) {
                     if (startIndex == i) {
-                        for (int j = 0; j < numberOfPagesInAddedFile; j++) {
-                            resultDocument.addPage(addedDocument.getPage(j));
+                        for (int j = 0; j < pagesInAddedFile; j++) {
+                            PDPage page = addedDocument.getPage(j);
+                            resultDocument.addPage(page);
+                            System.out.println("Мы добавили страницу " + page.toString() + " под индексом №" + j + " из файла: " + addedFileName);
                         }
-                        resultDocument.addPage(mainDocument.getPage(i));
                     }
-                    try {
-                        resultDocument.save(INSERT_PATH_OUTPUT.toFile());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    PDPage page = mainDocument.getPage(i);
+                    resultDocument.addPage(page);
+                    System.out.println("Мы добавили страницу " + page.toString() + " под индексом №" + i + " из файла: " + mainFileName);
+                }
+
+                try {
+                    resultDocument.save(INSERT_PATH_OUTPUT.toFile());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
