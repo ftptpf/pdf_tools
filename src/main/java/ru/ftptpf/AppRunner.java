@@ -39,14 +39,14 @@ public class AppRunner {
                     insert.run();
                     break;
                 case 3:
-                    System.out.println("Введите диапазон извлекаемых страниц. Сначала первую потом последнюю.");
+                    System.out.println("Введите диапазон извлекаемых страниц. Сначала номер первой страницы, потом последней.");
                     int startPage = scanner.nextInt();
                     int endPage = scanner.nextInt();
                     PdfService extract = new Extract(startPage, endPage);
                     extract.run();
                     break;
                 case 4:
-                    System.out.println("Введите диапазон удаляемых страниц. Сначала первую потом последнюю.");
+                    System.out.println("Введите диапазон удаляемых страниц. Сначала номер первой страницы, потом последней.");
                     int firstPage = scanner.nextInt();
                     int lastPage = scanner.nextInt();
                     PdfService delete = new Delete(firstPage, lastPage);
@@ -59,7 +59,6 @@ public class AppRunner {
                 default:
                     System.out.println("Неверно выбран номер меню");
             }
-
         }
     }
 }
