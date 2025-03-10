@@ -20,7 +20,7 @@ public class AppRunner {
             System.out.println("3 - Извлечь диапазон страниц и сохранить его в новый pdf файл");
             System.out.println("4 - Удалить страницы из pdf файла");
             System.out.println("5 - Выйти из программы");
-            System.out.println("Введите номер меню: ");
+            System.out.println("Введите числовой номер меню: ");
 
             int choice = scanner.nextInt();
 
@@ -30,24 +30,29 @@ public class AppRunner {
                     merge.run();
                     break;
                 case 2:
-                    System.out.println("Введите сначала имя основного файла, а затем имя файла с добавляемыми страницами.");
+                    System.out.println("Введите имя файла (включая расширение *.pdf, например 12345.pdf) в который будут вставляться страницы другого pdf файла.");
                     String mainFileName = scanner.next();
+                    System.out.println("Введите имя файла (включая расширение *.pdf, например 45.pdf) из которого будут извлекаться страницы для вставки.");
                     String addedFileName = scanner.next();
-                    System.out.println("Введите номер страницы, после которой начнется вставка.");
+                    System.out.println("Введите номер страницы основного pdf файла, после которой начнется вставка.");
                     int insertAfterThisPage = scanner.nextInt();
                     PdfService insert = new Insert(mainFileName, addedFileName, insertAfterThisPage);
                     insert.run();
                     break;
                 case 3:
-                    System.out.println("Введите диапазон извлекаемых страниц. Сначала номер первой страницы, потом последней.");
+                    System.out.println("Необходимо указать диапазон извлекаемых страниц.");
+                    System.out.println("Введите номер первой страницы:");
                     int startPage = scanner.nextInt();
+                    System.out.println("Введите номер последней страницы:");
                     int endPage = scanner.nextInt();
                     PdfService extract = new Extract(startPage, endPage);
                     extract.run();
                     break;
                 case 4:
-                    System.out.println("Введите диапазон удаляемых страниц. Сначала номер первой страницы, потом последней.");
+                    System.out.println("Необходимо указать диапазон удаляемых страниц.");
+                    System.out.println("Введите номер первой страницы:");
                     int firstPage = scanner.nextInt();
+                    System.out.println("Введите номер последней страницы:");
                     int lastPage = scanner.nextInt();
                     PdfService delete = new Delete(firstPage, lastPage);
                     delete.run();
