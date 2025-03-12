@@ -66,7 +66,7 @@ public class AppRunner {
                         System.out.println("Работа с программой завершена.");
                         break;
                     default:
-                        System.out.println("Неверно выбран номер меню");
+                        System.out.println("Неверно выбран номер меню. Это должны быть цифры от 1 до 5. Попробуйте еще раз.");
                 }
             }
         }

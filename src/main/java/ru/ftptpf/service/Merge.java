@@ -35,11 +35,11 @@ public class Merge implements PdfService {
                 throw new RuntimeException(e);
             }
         } else if (files.size() == 1) {
-            System.out.println("В папке один файл. Добавьте еще как минимум один и попробуйте снова.");
+            System.out.println("В папке один pdf файл. Добавьте еще как минимум один и попробуйте снова.");
         } else if (files.size() > 10) {
-            System.out.println("В папке больше 10 файлов. Это слишком много. Удалите лишние и попробуйте снова.");
+            System.out.println("В папке больше 10 pdf файлов. Это слишком много. Удалите лишние и попробуйте снова.");
         } else {
-            System.out.println("В папке нет файлов. Добавьте минимум 2 и попробуйте снова.");
+            System.out.println("В папке нет файлов. Добавьте минимум 2 pdf файла и попробуйте снова.");
         }
     }
 }
