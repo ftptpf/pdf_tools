@@ -1,5 +1,7 @@
 package ru.ftptpf;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.ftptpf.service.*;
 import ru.ftptpf.util.DirectoryUtil;
 
@@ -7,7 +9,15 @@ import java.util.Scanner;
 
 public class AppRunner {
 
+    private static final Logger LOGGER = LogManager.getLogger(AppRunner.class);
+
     public static void main(String[] args) {
+        LOGGER.trace("***TRACE***");
+        LOGGER.debug("***DEBUG***");
+        LOGGER.info("***INFO***");
+        LOGGER.warn("***WARN***");
+        LOGGER.error("***ERROR***");
+
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
         DirectoryUtil.createAllDirectories();
