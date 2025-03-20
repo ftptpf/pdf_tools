@@ -57,7 +57,7 @@ class MergeTest {
             PdfService merge = new Merge();
             merge.run();
             assertThat(systemOutContent.toString())
-                    .contains("В папке один pdf файл. Добавьте еще как минимум один и попробуйте снова.");
+                    .contains("В папке 1 pdf файл. Добавьте еще как минимум 1 pdf файл и попробуйте снова.");
         }
     }
 
