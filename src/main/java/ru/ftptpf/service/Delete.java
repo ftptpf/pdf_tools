@@ -1,5 +1,7 @@
 package ru.ftptpf.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import ru.ftptpf.util.DirectoryUtil;
@@ -13,6 +15,8 @@ import static ru.ftptpf.util.PdfConst.DELETE_PATH_OUTPUT;
 
 public class Delete implements PdfService {
 
+    private static final Logger LOGGER = LogManager.getLogger(Delete.class);
+
     private final int startPage;
     private final int endPage;
 
@@ -25,8 +29,9 @@ public class Delete implements PdfService {
     public void run() {
 
         List<File> files = DirectoryUtil.getPdfFilesFromDirectory(DELETE_PATH);
+        int filesInDirectory = files.size();
 
-        if (files.size() == 1) {
+        if (filesInDirectory == 1) {
             try {
                 try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
                     int numberOfPages = pdDocument.getNumberOfPages();
@@ -50,15 +55,19 @@ public class Delete implements PdfService {
                                 + "они будут удалены в рамках максимально / минимально возможных значений.");
                     } else {
                         System.out.println("Вы не можете удалить все страницы. Попробуйте задать другой диапазон.");
+                        LOGGER.info("При удалении страниц из фала задан неверный диапазон страниц. Попытка удалить все страницы файла.");
                     }
                 }
             } catch (IOException e) {
+                LOGGER.error("Произошла ошибка в операции удалении страниц из файла.", e);
                 throw new RuntimeException(e);
             }
-        } else if (files.size() > 1) {
+        } else if (filesInDirectory > 1) {
             System.out.println("В папке несколько файлов. Удалите лишние файлы и попробуйте снова.");
+            LOGGER.info("Операция удаления страниц из файла не была выполнена, так как в папке оказалось не 1,а {} pdf файлов.", filesInDirectory);
         } else {
             System.out.println("В папке нет файлов. Разместите в папке 1 файл и попробуйте еще раз.");
+            LOGGER.info("Операция удаления страниц из файла не была выполнена, так как в папке было {} pdf файлов.", filesInDirectory);
         }
     }
 }

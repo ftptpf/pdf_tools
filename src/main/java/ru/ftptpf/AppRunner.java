@@ -34,6 +34,7 @@ public class AppRunner {
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Необходимо ввести числовой номер меню. Это цифры от 1 до 5. Попробуйте еще раз.");
+                LOGGER.info("Вместо числового номера меню был введен набор символов: {}", scanner.nextLine());
                 scanner.nextLine();
             } else {
                 int choice = scanner.nextInt();
@@ -77,6 +78,7 @@ public class AppRunner {
                         break;
                     default:
                         System.out.println("Неверно выбран номер меню. Это должны быть цифры от 1 до 5. Попробуйте еще раз.");
+                        LOGGER.info("Была введена неверная цифра числового номера меню: {}", choice);
                 }
             }
         }

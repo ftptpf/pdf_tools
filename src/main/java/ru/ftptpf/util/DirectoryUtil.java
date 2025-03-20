@@ -1,5 +1,8 @@
 package ru.ftptpf.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +14,8 @@ import static ru.ftptpf.util.PdfConst.*;
 
 public final class DirectoryUtil {
 
+    private static final Logger LOGGER = LogManager.getLogger(DirectoryUtil.class);
+
     private DirectoryUtil() {
     }
 
@@ -21,6 +26,7 @@ public final class DirectoryUtil {
                     .filter(file -> file.getName().endsWith(".pdf"))
                     .toList();
         } catch (IOException e) {
+            LOGGER.error("Произошла ошибка получения списка файлов из директории {}. ", path, e);
             throw new RuntimeException(e);
         }
     }
@@ -31,6 +37,7 @@ public final class DirectoryUtil {
                 Files.createDirectory(path);
             }
         } catch (IOException e) {
+            LOGGER.error("Произошла ошибка создания директории: {}. ", path, e);
             throw new RuntimeException(e);
         }
     }

@@ -1,5 +1,7 @@
 package ru.ftptpf.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -15,6 +17,8 @@ import static ru.ftptpf.util.PdfConst.INSERT_PATH_OUTPUT;
 
 public class Insert implements PdfService {
 
+    private static final Logger LOGGER = LogManager.getLogger(Insert.class);
+
     private final String mainFileName;
     private final String addedFileName;
     private final int insertAfterThisPage;
@@ -29,6 +33,7 @@ public class Insert implements PdfService {
     public void run() {
 
         List<File> files = DirectoryUtil.getPdfFilesFromDirectory(INSERT_PATH);
+        int filesInDirectory = files.size();
 
         List<String> names = files.stream()
                 .map(File::getName)
@@ -36,7 +41,8 @@ public class Insert implements PdfService {
 
         if (!names.contains(mainFileName) && !names.contains(addedFileName)) {
             System.out.println("Файлы в папке не найдены! Проверьте наименования файлов и попробуйте ещё раз!");
-        } else if (files.size() >= 2 && files.size() <= 10) {
+            LOGGER.info("Основной {} и вспомогательный {} фалы при операции вставки страниц не были найдены в папке!", mainFileName, addedFileName);
+        } else if (filesInDirectory >= 2 && filesInDirectory <= 10) {
             File mainFile = files.stream()
                     .filter(file -> file.getName().equals(mainFileName))
                     .toList()
@@ -80,10 +86,12 @@ public class Insert implements PdfService {
                     try {
                         resultDocument.save(INSERT_PATH_OUTPUT.toFile());
                     } catch (IOException e) {
+                        LOGGER.error("Произошла ошибка в сохранении файла после вставки страниц!", e);
                         throw new RuntimeException(e);
                     }
                 }
             } catch (IOException e) {
+                LOGGER.error("Произошла ошибка в работе при вставке страниц!", e);
                 throw new RuntimeException(e);
             }
         }

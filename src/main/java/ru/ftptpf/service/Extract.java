@@ -1,5 +1,7 @@
 package ru.ftptpf.service;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PageExtractor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -14,6 +16,8 @@ import static ru.ftptpf.util.PdfConst.EXTRACT_PATH_OUTPUT;
 
 public class Extract implements PdfService {
 
+    private static final Logger LOGGER = LogManager.getLogger(Extract.class);
+
     private final int startPage;
     private final int endPage;
 
@@ -25,8 +29,9 @@ public class Extract implements PdfService {
     public void run() {
 
         List<File> files = DirectoryUtil.getPdfFilesFromDirectory(EXTRACT_PATH);
+        int filesInDirectory = files.size();
 
-        if (files.size() == 1) {
+        if (filesInDirectory == 1) {
             try {
                 try (PDDocument pdDocument = Loader.loadPDF(files.getFirst())) {
                     System.out.println("Исходный файл содержит " + pdDocument.getNumberOfPages() + " страниц.");
@@ -42,12 +47,15 @@ public class Extract implements PdfService {
                     }
                 }
             } catch (IOException e) {
+                LOGGER.error("Произошла ошибка в операции извлечения страниц из файла.", e);
                 throw new RuntimeException(e);
             }
-        } else if (files.size() > 1) {
+        } else if (filesInDirectory > 1) {
             System.out.println("В папке несколько файлов. Удалите лишние файлы и попробуйте снова.");
+            LOGGER.info("Операция извлечения страниц из файла не была выполнена, так как в папке оказалось не 1,а {} pdf файлов.", filesInDirectory);
         } else {
             System.out.println("В папке нет файлов. Разместите в папке файл и попробуйте еще раз.");
+            LOGGER.info("Операция извлечения страниц из файла не была выполнена, так как в папке было {} pdf файлов.", filesInDirectory);
         }
     }
 }
